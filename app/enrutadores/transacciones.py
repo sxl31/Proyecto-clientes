@@ -51,11 +51,14 @@ async def crear_transaccion(
             detail=f"La factura con id {factura_id} no existe."
         )
 
-    transaccion_val = Transaccion.model_validate(
-        datos_transaccion.model_dump()
-    )
+    # Agregar el factura_id antes de validar
+    datos = datos_transaccion.model_dump()
+    datos["factura_id"] = factura_id
 
-    transaccion_val.factura_id = factura_id
+    transaccion_val = Transaccion.model_validate(datos)
+
+    # Relación con la factura
+    transaccion_val.factura = factura_bd
 
     mi_sesion.add(transaccion_val)
     mi_sesion.commit()
